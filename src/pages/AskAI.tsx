@@ -1,8 +1,57 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Search, BarChart3, Paperclip, Send, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AskAI() {
+  const [message, setMessage] = useState("");
+  const [selectedAction, setSelectedAction] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handleSendMessage = () => {
+    if (!message.trim()) return;
+    
+    toast({
+      title: "Message sent!",
+      description: `${selectedAction ? selectedAction + ': ' : ''}${message}`,
+    });
+    
+    setMessage("");
+    setSelectedAction(null);
+  };
+
+  const handleActionSelect = (action: string) => {
+    setSelectedAction(selectedAction === action ? null : action);
+    toast({
+      title: `${action} ${selectedAction === action ? 'deselected' : 'selected'}`,
+      description: selectedAction === action ? "Action cleared" : `Now using ${action} mode`,
+    });
+  };
+
+  const handleFileAttach = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.onchange = (e) => {
+      const files = (e.target as HTMLInputElement).files;
+      if (files && files.length > 0) {
+        toast({
+          title: "Files selected",
+          description: `${files.length} file(s) ready to attach`,
+        });
+      }
+    };
+    input.click();
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] space-y-8">
       {/* Header */}
@@ -17,39 +66,54 @@ export default function AskAI() {
       </div>
 
       {/* Chat Input */}
-      <div className="w-full max-w-2xl space-y-4">
-        <div className="relative">
-          <Input
+      <div className="w-full max-w-3xl space-y-4">
+        <div className="relative bg-card border border-border rounded-2xl p-4 shadow-sm">
+          <Textarea
             placeholder="Ask anything or @mention a Space..."
-            className="w-full h-14 pl-4 pr-14 text-base rounded-xl border-border bg-card"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            className="min-h-[80px] border-0 bg-transparent resize-none text-base p-0 focus-visible:ring-0"
           />
           <Button
-            size="sm"
-            className="absolute right-2 top-2 h-10 w-10 rounded-lg bg-primary hover:bg-primary/90"
+            onClick={handleSendMessage}
+            disabled={!message.trim()}
+            className="absolute bottom-4 right-4 h-10 w-10 rounded-full bg-primary hover:bg-primary/90 disabled:opacity-50"
           >
             <Send className="w-4 h-4" />
           </Button>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center justify-center gap-3">
           <Button
-            variant="outline"
-            className="h-10 px-4 text-sm font-medium bg-card hover:bg-accent"
+            onClick={() => handleActionSelect("Deep Research")}
+            variant={selectedAction === "Deep Research" ? "default" : "outline"}
+            className={`h-10 px-4 text-sm font-medium rounded-full ${
+              selectedAction === "Deep Research" 
+                ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                : "bg-card hover:bg-accent border-border"
+            }`}
           >
             <Search className="w-4 h-4 mr-2" />
             Deep Research
           </Button>
           <Button
-            variant="outline"
-            className="h-10 px-4 text-sm font-medium bg-card hover:bg-accent"
+            onClick={() => handleActionSelect("Comparative Analysis")}
+            variant={selectedAction === "Comparative Analysis" ? "default" : "outline"}
+            className={`h-10 px-4 text-sm font-medium rounded-full ${
+              selectedAction === "Comparative Analysis" 
+                ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                : "bg-card hover:bg-accent border-border"
+            }`}
           >
             <BarChart3 className="w-4 h-4 mr-2" />
             Comparative Analysis
           </Button>
           <Button
+            onClick={handleFileAttach}
             variant="outline"
-            className="h-10 px-4 text-sm font-medium bg-card hover:bg-accent"
+            className="h-10 px-4 text-sm font-medium rounded-full bg-card hover:bg-accent border-border"
           >
             <Paperclip className="w-4 h-4 mr-2" />
             Attach File

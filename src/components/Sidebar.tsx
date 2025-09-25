@@ -13,7 +13,7 @@ const navigationItems = [
   {
     section: "TOOLS",
     items: [
-      { name: "Analysis Canvas", href: "/analysis", icon: BarChart3, description: "Custom visualizations" },
+      { name: "Analysis Canvas", href: "/analysis-canvas", icon: BarChart3, description: "Custom visualizations" },
       { name: "Reports", href: "/reports", icon: FileText, description: "Pre-built reports" },
     ],
   },

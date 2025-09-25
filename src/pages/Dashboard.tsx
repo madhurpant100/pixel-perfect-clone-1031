@@ -1,9 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { MetricCard } from "@/components/MetricCard";
 import { ChartCard } from "@/components/ChartCard";
+import { FilterModal } from "@/components/FilterModal";
 import { Filter, Plus, BarChart3, Zap } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const navigate = useNavigate();
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -13,11 +19,18 @@ export default function Dashboard() {
           <p className="text-muted-foreground">Track conversation insights and opportunity performance</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button 
+            onClick={() => navigate('/analysis-canvas')}
+            variant="outline" 
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+          >
             <BarChart3 className="w-4 h-4 mr-2" />
             Analysis Canvas
           </Button>
-          <Button variant="outline">
+          <Button 
+            onClick={() => navigate('/reports')}
+            variant="outline"
+          >
             Export Report
           </Button>
         </div>
@@ -29,7 +42,12 @@ export default function Dashboard() {
           <Filter className="w-4 h-4" />
           <span className="text-sm">Filters:</span>
         </div>
-        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+        <Button 
+          onClick={() => setIsFilterOpen(true)}
+          variant="ghost" 
+          size="sm" 
+          className="text-muted-foreground hover:text-foreground"
+        >
           <Plus className="w-4 h-4 mr-1" />
           Add Filters
         </Button>
@@ -156,6 +174,8 @@ export default function Dashboard() {
           </div>
         </ChartCard>
       </div>
+
+      <FilterModal open={isFilterOpen} onOpenChange={setIsFilterOpen} />
     </div>
   );
 }
